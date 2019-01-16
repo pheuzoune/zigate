@@ -162,9 +162,10 @@ class ZiGate(object):
         self._started = False
         self._no_response_count = 0
 
-        loop = asyncio.new_event_loop()
-        loop.create_task(self._event_loop(loop))
-        self._event_thread = threading.Thread(target=loop.run_forever,
+        self._tasker = []
+        self._loop = asyncio.new_event_loop()
+        self._loop.create_task(self._event_loop())
+        self._event_thread = threading.Thread(target=self._loop.run_forever,
                                               name='ZiGate-Event Loop')
         self._event_thread.setDaemon(True)
         self._event_thread.start()
@@ -186,19 +187,20 @@ class ZiGate(object):
         from .adminpanel import start_adminpanel
         start_adminpanel(self)
 
-    async def _event_loop(self, loop):
+    async def _event_loop(self):
+        print('_event_loop')
         while True:
             if self.connection and not self.connection.received.empty():
                 packet = self.connection.received.get()
                 dispatch_signal(ZIGATE_PACKET_RECEIVED, self, packet=packet)
-                loop.create_task(self.decode_data(packet))
+                asyncio.ensure_future(self.decode_data(packet), loop=self._loop)
 #                 t = threading.Thread(target=self.decode_data, args=(packet,),
 #                                      name='ZiGate-Decode data')
 #                 t.setDaemon(True)
 #                 t.start()
 #                 self.decode_data(packet)
             else:
-                asyncio.sleep(SLEEP_INTERVAL)
+                asyncio.sleep(SLEEP_INTERVAL, loop=self._loop)
 
     def setup_connection(self):
         self.connection = ThreadSerialConnection(self, self._port)
@@ -378,9 +380,6 @@ class ZiGate(object):
         self.connection.send(data)
 
     def send_data(self, cmd, data="", wait_response=None, wait_status=True):
-        '''
-        send data through ZiGate
-        '''
         LOGGER.debug('REQUEST : 0x{:04x} {}'.format(cmd, data))
         self._last_status[cmd] = None
         if wait_response:
@@ -423,6 +422,7 @@ class ZiGate(object):
         '''
         Decode raw packet message
         '''
+        print('decode_data', packet)
         try:
             decoded = self.zigate_decode(packet[1:-1])
             msg_type, length, checksum, value, rssi = \
@@ -451,6 +451,7 @@ class ZiGate(object):
             LOGGER.warning('Unknown response 0x{:04x}'.format(msg_type))
         LOGGER.debug(response)
         self._last_response[msg_type] = response
+        print('{:04x}'.format(msg_type), response)
         self.interpret_response(response)
         dispatch_signal(ZIGATE_RESPONSE_RECEIVED, self, response=response)
 
@@ -658,7 +659,7 @@ class ZiGate(object):
         LOGGER.debug('Waiting for message 0x{:04x}'.format(msg_type))
         t1 = time()
         while self._last_response.get(msg_type) is None:
-            sleep(0.01)
+            asyncio.sleep(SLEEP_INTERVAL, loop=self._loop)
             t2 = time()
             if t2 - t1 > WAIT_TIMEOUT:  # no response timeout
                 LOGGER.warning('No response waiting command 0x{:04x}'.format(msg_type))
@@ -673,7 +674,7 @@ class ZiGate(object):
         LOGGER.debug('Waiting for status message for command 0x{:04x}'.format(cmd))
         t1 = time()
         while self._last_status.get(cmd) is None:
-            sleep(0.01)
+            sleep(SLEEP_INTERVAL)
             t2 = time()
             if t2 - t1 > WAIT_TIMEOUT:  # no response timeout
                 self._no_response_count += 1
