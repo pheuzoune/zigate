@@ -293,6 +293,22 @@ def cube_decode(value):
         value = 'flip90_{}{}'.format(face1, face2)
     return value
 
+def xiaomi_wireless_wallswitch_decode(value):
+    '''
+    Special decoder for XIAOMI wireless wallswitch
+    '''
+    if value == '' or value is None:
+        return value
+    events = {0x0001: 'simpleclick',
+              0x0002: 'doubleclick',
+              0x0000: 'longclick',
+              }
+    if value in events:
+        return events[value]
+    else:
+        value = 'unknown'
+    return value
+
 
 @register_cluster
 class C0012(Cluster):
@@ -311,6 +327,18 @@ class C0012(Cluster):
                                             'expire': 2, 'type': int},
                                    }
 
+        #lumi.remote.b286acn01
+        wallswitch_b286acn01 = {
+          0x05F01 : 'right',
+          0x05F02 : 'left',
+          0x05F03 : 'both'
+        }
+        if self._endpoint['device'] in wallswitch_b286acn01:  # lumi.remote.b1acn01
+            self.attributes_def = {0x0055: {'name': wallswitch_b286acn01[self._endpoint['device']],
+                                            'value': 'xiaomi_wireless_wallswitch_decode(value)',
+                                            'expire': 0.5, 'expire_value': '', 'type': str},
+
+                                   }
 
 class C000f(Cluster):
     cluster_id = 0x000f
