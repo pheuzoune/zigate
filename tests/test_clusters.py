@@ -47,7 +47,7 @@ class TestResponses(unittest.TestCase):
                          )
 
         # lumi.remote.b286acn01
-        endpoint = {'device': 24321, 'endpoint':1}
+        endpoint = {'device': 24321, 'endpoint': 1}
         data = {"attributes": [{"attribute": 85,
                                 "data": 1,
                                 "expire": 2,
@@ -65,8 +65,6 @@ class TestResponses(unittest.TestCase):
                                "expire_value": "",
                                'type': str}}
                          )
-
-
 
         endpoint = {'device': 1}
         data = {"attributes": [{"attribute": 5,

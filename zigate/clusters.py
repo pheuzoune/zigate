@@ -131,7 +131,6 @@ class Cluster(object):
                 'attributes': list(self.attributes.values())
                 }
 
-
     @staticmethod
     def from_json(data, endpoint=None):
         cluster_id = data['cluster']
@@ -304,6 +303,7 @@ def cube_decode(value):
         value = 'flip90_{}{}'.format(face1, face2)
     return value
 
+
 def xiaomi_wireless_wallswitch_decode(value):
     '''
     Special decoder for XIAOMI wireless wallswitch
@@ -337,18 +337,15 @@ class C0012(Cluster):
                                             'value': 'value',
                                             'expire': 2, 'type': int},
                                    }
-        #lumi.remote.b286acn01
+        # lumi.remote.b286acn01
         if self.decoder == 'lumi.remote.b286acn01':
-            wallswitch_b286acn01 = {
-              1 : 'left',
-              2 : 'right',
-              3 : 'both'
-            }
+            wallswitch_b286acn01 = {1: 'left', 2: 'right', 3: 'both'}
             endpoint_id = 1 if 'endpoint' not in endpoint else endpoint['endpoint']
             self.attributes_def = {0x0055: {'name': wallswitch_b286acn01[endpoint_id],
                                             'value': 'xiaomi_wireless_wallswitch_decode(value)',
                                             'expire': 0.5, 'expire_value': '', 'type': str},
                                    }
+
 
 class C000f(Cluster):
     cluster_id = 0x000f
