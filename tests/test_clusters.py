@@ -46,6 +46,28 @@ class TestResponses(unittest.TestCase):
                                'type': int}}
                          )
 
+        # lumi.remote.b286acn01
+        endpoint = {'device': 24321, 'endpoint':1}
+        data = {"attributes": [{"attribute": 85,
+                                "data": 1,
+                                "expire": 2,
+                                "expire_value": "",
+                                "name": "movement",
+                                "value": ""}],
+                "cluster": 18,
+                "decoder": "lumi.remote.b286acn01"
+                }
+        c = clusters.C0012.from_json(data, endpoint)
+        self.assertEqual(c.attributes,
+                         {85: {'attribute': 85, 'data': 1,
+                               'expire': 0.5,
+                               'name': 'left', 'value': 'simpleclick',
+                               "expire_value": "",
+                               'type': str}}
+                         )
+
+
+
         endpoint = {'device': 1}
         data = {"attributes": [{"attribute": 5,
                                 "data": 'test.test',
@@ -74,7 +96,7 @@ class TestResponses(unittest.TestCase):
         jdata = json.dumps(c, cls=core.DeviceEncoder, sort_keys=True)
         self.assertEqual(jdata,
                          ('{"attributes": [{"attribute": 5, "data": "test.test", "name": "type", '
-                          '"type": "str", "value": "test.test"}], "cluster": 0}'))
+                          '"type": "str", "value": "test.test"}], "cluster": 0, "decoder": "generic"}'))
 
     def test_cluster_C0101(self):
         endpoint = {'device': 1}

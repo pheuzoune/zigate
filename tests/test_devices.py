@@ -37,7 +37,7 @@ class TestCore(unittest.TestCase):
         self.assertEqual(data,
                          ('{"addr": "1234", "discovery": "", "endpoints": [{"clusters": [{"attributes": '
                           '[{"attribute": 5, "data": '
-                          '"test", "name": "type", "type": "str", "value": "test"}], "cluster": 0}], "device": 0, '
+                          '"test", "name": "type", "type": "str", "value": "test"}], "cluster": 0, "decoder": "generic"}], "device": 0, '
                           '"endpoint": 1, "in_clusters": [], "out_clusters": [], "profile": 0}], "generictype": "", '
                           '"info": {"addr": "1234", "ieee": "0123456789abcdef", "last_seen": "' + last_seen + '", '
                           '"rssi": 255}}'))

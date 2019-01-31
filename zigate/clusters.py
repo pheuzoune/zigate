@@ -71,10 +71,13 @@ class Cluster(object):
     cluster_id = None
     type = 'Unknown cluster'
     attributes_def = {}
+    decoder = 'generic'
 
     def __init__(self, endpoint=None):
         self.attributes = {}
         self._endpoint = endpoint
+        if endpoint and 'decoder' in endpoint:
+            self.decoder = endpoint['decoder']
 
     def update(self, data):
         attribute_id = data['attribute']
@@ -124,12 +127,20 @@ class Cluster(object):
 
     def to_json(self):
         return {'cluster': self.cluster_id,
+                'decoder': self.decoder,
                 'attributes': list(self.attributes.values())
                 }
+
 
     @staticmethod
     def from_json(data, endpoint=None):
         cluster_id = data['cluster']
+        if 'decoder' in data:
+            if endpoint:
+                endpoint['decoder'] = data['decoder']
+            else:
+                endpoint = {'decoder': data['decoder']}
+
         cluster = CLUSTERS.get(cluster_id, Cluster)
         cluster = cluster(endpoint)
         if type(cluster) == Cluster:
@@ -326,18 +337,17 @@ class C0012(Cluster):
                                             'value': 'value',
                                             'expire': 2, 'type': int},
                                    }
-
         #lumi.remote.b286acn01
-        wallswitch_b286acn01 = {
-          0x05F01 : 'right',
-          0x05F02 : 'left',
-          0x05F03 : 'both'
-        }
-        if self._endpoint['device'] in wallswitch_b286acn01:  # lumi.remote.b1acn01
-            self.attributes_def = {0x0055: {'name': wallswitch_b286acn01[self._endpoint['device']],
+        if self.decoder == 'lumi.remote.b286acn01':
+            wallswitch_b286acn01 = {
+              1 : 'left',
+              2 : 'right',
+              3 : 'both'
+            }
+            endpoint_id = 1 if 'endpoint' not in endpoint else endpoint['endpoint']
+            self.attributes_def = {0x0055: {'name': wallswitch_b286acn01[endpoint_id],
                                             'value': 'xiaomi_wireless_wallswitch_decode(value)',
                                             'expire': 0.5, 'expire_value': '', 'type': str},
-
                                    }
 
 class C000f(Cluster):

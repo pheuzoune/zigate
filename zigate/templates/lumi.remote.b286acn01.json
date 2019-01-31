@@ -17,7 +17,8 @@
                             "attribute": 85
                         }
                     ],
-                    "cluster": 18
+                    "cluster": 18,
+                    "decoder": "lumi.remote.b286acn01"
                 }
             ],
             "device": 24321,
@@ -48,10 +49,11 @@
                             "attribute": 85
                         }
                     ],
-                    "cluster": 18
+                    "cluster": 18,
+                    "decoder": "lumi.remote.b286acn01"
                 }
             ],
-            "device": 24322,
+            "device": 0,
             "endpoint": 2,
             "in_clusters": [],
             "out_clusters": [],
@@ -65,10 +67,11 @@
                             "attribute": 85
                         }
                     ],
-                    "cluster": 18
+                    "cluster": 18,
+                    "decoder": "lumi.remote.b286acn01"
                 }
             ],
-            "device": 24323,
+            "device": 0,
             "endpoint": 3,
             "in_clusters": [],
             "out_clusters": [],
